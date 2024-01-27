@@ -2,21 +2,23 @@ import clsx from "clsx";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { google } from "googleapis";
 
 import { createOAuth2Client } from "@/utility/oauth2-client";
 
 dayjs.extend(isBetween);
 dayjs.extend(timezone);
+dayjs.extend(utc);
 dayjs.tz.setDefault("Asia/Tokyo");
 
 const holidayCalendarId = "ja.japanese#holiday@group.v.calendar.google.com";
 
 const createCalendarArray = (
-  year = dayjs().year(),
-  month = dayjs().month()
+  year = dayjs().tz().year(),
+  month = dayjs().tz().month()
 ) => {
-  const startOfMonth = dayjs().year(year).month(month).startOf("month");
+  const startOfMonth = dayjs().tz().year(year).month(month).startOf("month");
   const endOfMonth = startOfMonth.endOf("month");
 
   let currentDate = startOfMonth.startOf("week");
@@ -59,17 +61,17 @@ export const Calendar = async (props: Props) => {
     data: { items: holidayEvents },
   } = await calendar.events.list({
     calendarId: holidayCalendarId,
-    timeMin: dayjs().startOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-    timeMax: dayjs().endOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMin: dayjs().tz().startOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMax: dayjs().tz().endOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
   });
 
   const holidayDates = holidayEvents
     ?.filter((event) => event.start?.date)
-    .map((event) => dayjs(event.start?.date).date());
+    .map((event) => dayjs(event.start?.date).tz().date());
 
   return (
     <div className="flex size-full flex-col gap-2">
-      <div>{dayjs().format("MMMM")}</div>
+      <div>{dayjs().tz().format("MMMM")}</div>
 
       <table className="grid size-full grid-cols-7 content-between">
         <thead className="contents">
@@ -98,7 +100,7 @@ export const Calendar = async (props: Props) => {
                         j === week.length - 1 ||
                         (day && holidayDates?.includes(day)),
                     },
-                    { "text-white bg-red-500": day === dayjs().date() }
+                    { "text-white bg-red-500": day === dayjs().tz().date() }
                   )}
                 >
                   {day}

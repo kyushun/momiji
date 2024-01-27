@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { google } from "googleapis";
 import { getServerSession } from "next-auth";
 
@@ -7,6 +8,7 @@ import { authOptions } from "@/utility/next-auth";
 import { createOAuth2Client } from "@/utility/oauth2-client";
 
 dayjs.extend(timezone);
+dayjs.extend(utc);
 dayjs.tz.setDefault("Asia/Tokyo");
 
 export const Schedule = async () => {
@@ -19,8 +21,8 @@ export const Schedule = async () => {
     data: { items: events },
   } = await calendar.events.list({
     calendarId: session?.user?.email ?? undefined,
-    timeMin: dayjs().startOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-    timeMax: dayjs().endOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMin: dayjs().tz().startOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMax: dayjs().tz().endOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
   });
 
   return (
@@ -36,8 +38,8 @@ export const Schedule = async () => {
             className="flex flex-col gap-1 rounded bg-gray-1000 px-4 py-2"
           >
             <div className="text-sm text-gray-500">
-              {dayjs(event.start?.dateTime).format("H:mm")} -{" "}
-              {dayjs(event.end?.dateTime).format("H:mm")}
+              {dayjs(event.start?.dateTime).tz().format("H:mm")} -{" "}
+              {dayjs(event.end?.dateTime).tz().format("H:mm")}
             </div>
             <div>{event.summary ?? "(no title)"}</div>
           </li>
