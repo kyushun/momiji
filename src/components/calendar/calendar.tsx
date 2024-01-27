@@ -1,15 +1,21 @@
-"use client";
-
 import clsx from "clsx";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import timezone from "dayjs/plugin/timezone";
+import { google } from "googleapis";
+
+import { createOAuth2Client } from "@/utility/oauth2-client";
 
 dayjs.extend(isBetween);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Tokyo");
 
-function createCalendarArray(
+const holidayCalendarId = "ja.japanese#holiday@group.v.calendar.google.com";
+
+const createCalendarArray = (
   year = dayjs().year(),
   month = dayjs().month()
-): (number | null)[][] {
+) => {
   const startOfMonth = dayjs().year(year).month(month).startOf("month");
   const endOfMonth = startOfMonth.endOf("month");
 
@@ -35,15 +41,31 @@ function createCalendarArray(
   }
 
   return calendar;
-}
+};
 
 type Props = {
   year?: number;
   month?: number;
 };
 
-export const Calendar = (props: Props) => {
-  const calendar = createCalendarArray(props.year, props.month);
+export const Calendar = async (props: Props) => {
+  const calendarArray = createCalendarArray(props.year, props.month);
+
+  const oauth2Client = await createOAuth2Client();
+
+  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+
+  const {
+    data: { items: holidayEvents },
+  } = await calendar.events.list({
+    calendarId: holidayCalendarId,
+    timeMin: dayjs().startOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMax: dayjs().endOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+  });
+
+  const holidayDates = holidayEvents
+    ?.filter((event) => event.start?.date)
+    .map((event) => dayjs(event.start?.date).date());
 
   return (
     <div className="flex size-full flex-col gap-2">
@@ -63,14 +85,20 @@ export const Calendar = (props: Props) => {
           </tr>
         </thead>
         <tbody className="contents">
-          {calendar.map((week, i) => (
+          {calendarArray.map((week, i) => (
             <tr key={i} className="contents">
               {week.map((day, j) => (
                 <td
                   key={(day || 0) + j}
                   className={clsx(
-                    "grid size-8 place-content-center rounded-full first:text-gray-500 last:text-gray-500",
-                    { "bg-red-500": day === dayjs().date() }
+                    "grid size-8 place-content-center rounded-full",
+                    {
+                      "text-gray-500":
+                        j === 0 ||
+                        j === week.length - 1 ||
+                        (day && holidayDates?.includes(day)),
+                    },
+                    { "text-white bg-red-500": day === dayjs().date() }
                   )}
                 >
                   {day}
