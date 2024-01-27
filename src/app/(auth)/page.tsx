@@ -1,7 +1,16 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
 import { Calendar } from "@/components/calendar";
 import { Schedule } from "@/components/schedule";
 
+import { RefreshController } from "./refresh-controller";
 import { WakeLockController } from "./wake-lock-controller";
+
+dayjs.extend(timezone);
+dayjs.extend(utc);
+dayjs.tz.setDefault("Asia/Tokyo");
 
 export default function Home() {
   return (
@@ -16,7 +25,12 @@ export default function Home() {
         <Calendar />
       </div>
 
+      <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+        Last Updated: {dayjs().tz().format("HH:mm:ss")}
+      </div>
+
       <WakeLockController />
+      <RefreshController />
     </main>
   );
 }
