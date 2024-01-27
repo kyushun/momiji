@@ -1,25 +1,24 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import { google } from "googleapis";
+import { getServerSession } from "next-auth";
 
+import { authOptions } from "@/utility/next-auth";
 import { createOAuth2Client } from "@/utility/oauth2-client";
 
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Tokyo");
 
 export const Schedule = async () => {
+  const session = await getServerSession(authOptions);
+
   const oauth2Client = await createOAuth2Client();
 
   const calendar = google.calendar({ version: "v3", auth: oauth2Client });
-
-  const { data: calendarList } = await calendar.calendarList.list();
-
-  const calendarId = calendarList.items?.[0].id ?? undefined;
-
   const {
     data: { items: events },
   } = await calendar.events.list({
-    calendarId,
+    calendarId: session?.user?.email ?? undefined,
     timeMin: dayjs().startOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
     timeMax: dayjs().endOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
   });
