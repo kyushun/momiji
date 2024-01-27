@@ -1,10 +1,6 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "@/utility/next-auth";
 
 export const metadata: Metadata = {
   title: "Momiji",
@@ -23,14 +19,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/api/auth/signin");
-  }
-
   return (
-    <html lang="en" className="text-[18px]">
+    <html lang="en" className="bg-black text-[18px] text-white">
       <body>{children}</body>
     </html>
   );
