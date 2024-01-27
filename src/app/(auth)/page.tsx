@@ -1,6 +1,8 @@
 import { Calendar } from "@/components/calendar";
 import { Schedule } from "@/components/schedule";
 
+import { WakeLockController } from "./wake-lock-controller";
+
 export default function Home() {
   return (
     <main className="grid h-dvh w-dvw gap-8 bg-black p-8 font-semibold text-white portrait:grid-rows-[1fr_2fr] landscape:grid-cols-[2fr_1fr]">
@@ -13,6 +15,8 @@ export default function Home() {
         {/* @ts-expect-error Server Component */}
         <Calendar />
       </div>
+
+      <WakeLockController />
     </main>
   );
 }
