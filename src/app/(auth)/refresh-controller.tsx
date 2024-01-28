@@ -16,11 +16,15 @@ export const RefreshController = () => {
       const minutes = now.minute();
       const nextRefreshMinute =
         refreshMinutes.find((min) => min > minutes) || refreshMinutes[0];
-      const nextRefreshTime = now.minute(nextRefreshMinute).startOf("minute");
 
-      if (minutes > 55) nextRefreshTime.add(1, "hour");
+      let nextRefreshTime = now.minute(nextRefreshMinute).startOf("minute");
+      if (minutes >= refreshMinutes[refreshMinutes.length - 1]) {
+        nextRefreshTime = nextRefreshTime.add(1, "hour");
+      }
 
       const delay = nextRefreshTime.diff(now);
+
+      if (delay <= 0) throw new Error("Invalid delay");
 
       timeoutIdRef.current = setTimeout(() => {
         router.refresh();
