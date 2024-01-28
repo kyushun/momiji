@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "./next-auth";
@@ -16,7 +17,7 @@ export const createOAuth2Client = async () => {
   const refreshToken = session?.token.refreshToken;
 
   if (!accessToken || !refreshToken) {
-    throw new Error("No access token or refresh token.");
+    redirect("/login");
   }
 
   oauth2Client.setCredentials({
