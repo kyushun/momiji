@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { google } from "googleapis";
@@ -7,6 +8,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/utility/next-auth";
 import { createOAuth2Client } from "@/utility/oauth2-client";
 
+import { EventItem } from "./event-item";
+
+dayjs.extend(isBetween);
 dayjs.extend(timezone);
 dayjs.extend(utc);
 dayjs.tz.setDefault("Asia/Tokyo");
@@ -28,22 +32,60 @@ export const Schedule = async () => {
   return (
     <ol className="flex flex-col gap-2">
       {events
-        ?.sort((a, b) =>
-          dayjs(a.start?.dateTime).isAfter(dayjs(b.start?.dateTime)) ? 1 : -1
+        ?.filter((event) => event.start?.date)
+        .map((event) => {
+          const accepted =
+            !event.attendees ||
+            event.attendees.find(
+              (attendee) => attendee.email === session?.user?.email
+            )?.responseStatus === "accepted";
+
+          return (
+            <EventItem
+              key={event.id}
+              summary={event.summary ?? undefined}
+              accepted={accepted}
+            />
+          );
+        })}
+
+      {events
+        ?.filter((event) => !event.start?.date)
+        .filter(
+          (event) =>
+            event.eventType === "default" || event.eventType === "outOfOffice"
         )
-        .filter((event) => !event.start?.date)
-        .map((event, i) => (
-          <li
-            key={event.id}
-            className="flex flex-col gap-1 rounded bg-gray-1000 px-4 py-2"
-          >
-            <div className="text-sm text-gray-500">
-              {dayjs(event.start?.dateTime).tz().format("H:mm")} -{" "}
-              {dayjs(event.end?.dateTime).tz().format("H:mm")}
-            </div>
-            <div>{event.summary ?? "(no title)"}</div>
-          </li>
-        ))}
+        .filter(
+          (event) =>
+            event.attendees?.find(
+              (attendee) => attendee.email === session?.user?.email
+            )?.responseStatus !== "declined"
+        )
+        .filter((event) => dayjs().tz().isBefore(dayjs(event.end?.dateTime)))
+        .sort((a, b) =>
+          dayjs(a.start?.dateTime).tz().isAfter(dayjs(b.start?.dateTime))
+            ? 1
+            : -1
+        )
+        .map((event) => {
+          const accepted =
+            !event.attendees ||
+            event.attendees.find(
+              (attendee) => attendee.email === session?.user?.email
+            )?.responseStatus === "accepted";
+
+          return (
+            <EventItem
+              key={event.id}
+              summary={event.summary ?? undefined}
+              dateTime={{
+                start: event.start?.dateTime ?? undefined,
+                end: event.end?.dateTime ?? undefined,
+              }}
+              accepted={accepted}
+            />
+          );
+        })}
     </ol>
   );
 };
