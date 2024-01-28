@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-import { Calendar } from "@/components/calendar";
+import { CalendarWidget } from "@/components/calendar-widget";
 import { Schedule } from "@/components/schedule";
 
 import { RefreshController } from "./refresh-controller";
@@ -20,7 +20,7 @@ export default function Home() {
       </div>
 
       <div className="portrait:order-1 landscape:order-2">
-        <Calendar />
+        <CalendarWidget />
       </div>
 
       <div className="absolute bottom-2 right-2 text-xs text-gray-500">
