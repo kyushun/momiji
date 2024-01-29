@@ -23,7 +23,7 @@ export default function Home() {
         <CalendarWidget />
       </div>
 
-      <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+      <div className="fixed bottom-2 right-2 z-50 text-xs text-gray-500">
         Last Updated: {dayjs().tz().format("HH:mm:ss")}
       </div>
 
