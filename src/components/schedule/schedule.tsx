@@ -25,6 +25,7 @@ export const Schedule = async () => {
     data: { items: events },
   } = await calendar.events.list({
     calendarId: session?.user?.email ?? undefined,
+    singleEvents: true,
     timeMin: dayjs().tz().startOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
     timeMax: dayjs().tz().endOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
   });
