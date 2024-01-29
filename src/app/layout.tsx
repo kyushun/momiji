@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     notranslate: true,
   },
   manifest: "/manifest.json",
+  other: { google: "notranslate" },
 };
 
 export default async function RootLayout({
@@ -21,7 +22,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-black text-[18px] text-white">
+    <html className="bg-black text-[18px] text-white">
       <body>{children}</body>
     </html>
   );
