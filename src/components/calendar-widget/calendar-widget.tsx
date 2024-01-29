@@ -1,15 +1,9 @@
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { google } from "googleapis";
 
+import { dayjs } from "@/utility/dayjs";
 import { createOAuth2Client } from "@/utility/oauth2-client";
 
 import { CalendarSlides } from "./calendar";
-
-dayjs.extend(timezone);
-dayjs.extend(utc);
-dayjs.tz.setDefault("Asia/Tokyo");
 
 const calendarCount = 3;
 
@@ -24,9 +18,8 @@ export const CalendarWidget = async () => {
     data: { items: holidayEvents },
   } = await calendar.events.list({
     calendarId: holidayCalendarId,
-    timeMin: dayjs().tz().startOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+    timeMin: dayjs().startOf("month").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
     timeMax: dayjs()
-      .tz()
       .add(calendarCount, "month")
       .endOf("month")
       .format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
@@ -35,7 +28,7 @@ export const CalendarWidget = async () => {
   const holidayDates =
     holidayEvents
       ?.filter((event) => event.start?.date)
-      .map((event) => dayjs(event.start?.date).tz().toISOString()) ?? [];
+      .map((event) => dayjs(event.start?.date).toISOString()) ?? [];
 
   return (
     <CalendarSlides calendarCount={calendarCount} holidayDates={holidayDates} />

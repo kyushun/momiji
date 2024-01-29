@@ -3,22 +3,15 @@
 import "swiper/css";
 
 import clsx from "clsx";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-dayjs.extend(isBetween);
-dayjs.extend(timezone);
-dayjs.extend(utc);
-dayjs.tz.setDefault("Asia/Tokyo");
+import { dayjs } from "@/utility/dayjs";
 
 const createCalendarArray = (
-  year = dayjs().tz().year(),
-  month = dayjs().tz().month()
+  year = dayjs().year(),
+  month = dayjs().month()
 ) => {
-  const startOfMonth = dayjs().tz().year(year).month(month).startOf("month");
+  const startOfMonth = dayjs().year(year).month(month).startOf("month");
   const endOfMonth = startOfMonth.endOf("month");
 
   let currentDate = startOfMonth.startOf("week");
@@ -52,7 +45,7 @@ const CalendarElement = ({
   date: string;
   holidayDates: string[];
 }) => {
-  const calendarDate = dayjs(date).tz();
+  const calendarDate = dayjs(date);
   const calendarArray = createCalendarArray(
     calendarDate.year(),
     calendarDate.month()
@@ -88,13 +81,12 @@ const CalendarElement = ({
                         holidayDates.some((holidayDate) =>
                           calendarDate
                             .date(date)
-                            .isSame(dayjs(holidayDate).tz(), "date")
+                            .isSame(dayjs(holidayDate), "date")
                         )),
                   },
                   {
                     "text-white bg-red-500":
-                      date &&
-                      calendarDate.date(date).isSame(dayjs().tz(), "date"),
+                      date && calendarDate.date(date).isSame(dayjs(), "date"),
                   }
                 )}
               >
@@ -115,7 +107,7 @@ export const CalendarSlides = ({
   calendarCount: number;
   holidayDates: string[];
 }) => {
-  const now = dayjs().tz();
+  const now = dayjs();
 
   return (
     <Swiper slidesPerView="auto" className="h-full">

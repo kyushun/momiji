@@ -1,8 +1,9 @@
 "use client";
 
-import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+
+import { dayjs } from "@/utility/dayjs";
 
 const refreshCount = 4;
 

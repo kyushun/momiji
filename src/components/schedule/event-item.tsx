@@ -1,11 +1,6 @@
 import clsx from "clsx";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 
-dayjs.extend(timezone);
-dayjs.extend(utc);
-dayjs.tz.setDefault("Asia/Tokyo");
+import { dayjs } from "@/utility/dayjs";
 
 type EventItemProps = {
   summary?: string;
@@ -28,8 +23,8 @@ export const EventItem = ({ summary, dateTime, accepted }: EventItemProps) => (
   >
     {dateTime?.start && dateTime?.end && (
       <div className="text-sm text-gray-500">
-        {dayjs(dateTime.start).tz().format("H:mm")} -{" "}
-        {dayjs(dateTime.end).tz().format("H:mm")}
+        {dayjs(dateTime.start).format("H:mm")} -{" "}
+        {dayjs(dateTime.end).format("H:mm")}
       </div>
     )}
     <div>{summary ?? "(no title)"}</div>
