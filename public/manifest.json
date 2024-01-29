@@ -1,7 +1,7 @@
 {
   "name": "momiji",
   "short_name": "momiji",
-  "start_url": ".",
+  "start_url": "/",
   "display": "fullscreen",
   "theme_color": "#000000",
   "background_color": "#000000",
