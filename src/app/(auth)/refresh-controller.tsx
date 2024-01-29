@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { dayjs } from "@/utility/dayjs";
 
-const refreshCount = 4;
+const refreshCount = 6;
 
 export const RefreshController = () => {
   const router = useRouter();
