@@ -1,10 +1,11 @@
 import { google } from "googleapis";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
+import { cache } from "react";
 
 import { authOptions } from "./next-auth";
 
-export const createOAuth2Client = async () => {
+export const createOAuth2Client = cache(async () => {
   const session = await getServerSession(authOptions);
 
   const oauth2Client = new google.auth.OAuth2({
@@ -32,4 +33,4 @@ export const createOAuth2Client = async () => {
   }
 
   return oauth2Client;
-};
+});
