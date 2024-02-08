@@ -25,5 +25,11 @@ export const createOAuth2Client = async () => {
     refresh_token: refreshToken,
   });
 
+  try {
+    await oauth2Client.getTokenInfo(oauth2Client.credentials.access_token!);
+  } catch (_) {
+    redirect("/login");
+  }
+
   return oauth2Client;
 };
