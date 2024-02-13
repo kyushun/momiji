@@ -27,7 +27,7 @@ export const createOAuth2Client = cache(async () => {
   });
 
   try {
-    await oauth2Client.getTokenInfo(oauth2Client.credentials.access_token!);
+    await oauth2Client.getAccessToken();
   } catch (_) {
     redirect("/login");
   }
