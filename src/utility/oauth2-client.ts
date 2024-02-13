@@ -24,6 +24,7 @@ export const createOAuth2Client = cache(async () => {
   oauth2Client.setCredentials({
     access_token: accessToken,
     refresh_token: refreshToken,
+    expiry_date: session.token.expiresAt,
   });
 
   try {
