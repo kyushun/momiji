@@ -1,21 +1,42 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export const WakeLockController = () => {
-  useEffect(() => {
-    let wakeLock: WakeLockSentinel | undefined;
+  const wakeLockRef = useRef<WakeLockSentinel>();
 
-    (async () => {
-      if ("wakeLock" in navigator) {
-        wakeLock = await navigator.wakeLock.request("screen");
-      }
-    })();
+  const request = useCallback(async () => {
+    const isSupported =
+      typeof window !== "undefined" && "wakeLock" in navigator;
+
+    if (!isSupported) return;
+
+    wakeLockRef.current = await navigator.wakeLock.request("screen");
+    wakeLockRef.current.addEventListener("release", () => {
+      wakeLockRef.current = undefined;
+    });
+  }, []);
+
+  const release = useCallback(async () => {
+    await wakeLockRef.current?.release();
+  }, []);
+
+  useEffect(() => {
+    request();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+
+      request();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      wakeLock?.release();
+      release();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [release, request]);
 
   return null;
 };
