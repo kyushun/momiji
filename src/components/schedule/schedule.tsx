@@ -1,26 +1,15 @@
-import { google } from "googleapis";
 import { getServerSession } from "next-auth";
 
+import { getCachedEvents } from "@/cached-data/events";
 import { dayjs } from "@/utility/dayjs";
 import { authOptions } from "@/utility/next-auth";
-import { createOAuth2Client } from "@/utility/oauth2-client";
 
 import { EventItem } from "./event-item";
 
 export const Schedule = async () => {
   const session = await getServerSession(authOptions);
 
-  const oauth2Client = await createOAuth2Client();
-
-  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
-  const {
-    data: { items: events },
-  } = await calendar.events.list({
-    calendarId: session?.user?.email ?? undefined,
-    singleEvents: true,
-    timeMin: dayjs().startOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-    timeMax: dayjs().endOf("date").format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-  });
+  const events = await getCachedEvents(session?.user?.email || undefined);
 
   return (
     <ol className="flex flex-col gap-2">
